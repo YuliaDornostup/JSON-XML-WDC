@@ -20,6 +20,8 @@ app.get("/", (req, res) => {
 
 app.post("/proxy/*", async (req, res) => {
   const url = req.url.split("/proxy/")[1];
+  console.log('Executing request: URL=' + url + " ; method=" + req.body.method);
+
   let options = {
     method: req.body.method
   };
@@ -33,6 +35,10 @@ app.post("/proxy/*", async (req, res) => {
   } else if (req.body.token) {
     options["headers"]["Authorization"] = `Bearer ${req.body.token}`;
   }
+
+  if (req.body.data) {
+    options["body"] = new URLSearchParams(req.body.data);
+  }
   
   try {
     const response = await fetch(url, options);
@@ -40,9 +46,11 @@ app.post("/proxy/*", async (req, res) => {
       const body = await response.text();
       res.send({ body });
     } else {
+      console.log('Response not ok: ' + response.statusText);
       res.send({ error: response.statusText });
     }
   } catch (error) {
+    console.log('Error: ' + error.message);
     res.send({ error: error.message });
   }
 });

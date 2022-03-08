@@ -27,57 +27,14 @@
             <div class="info" title="More Info">?</div>
           </a>
         </div>
-        <p class="label">Enter a URL for JSON/XML data:</p>
+        <p class="label">Tenant id:</p>
         <div class="row">
-          <input id="url" type="url" />
-          <select id="method">
-            <option value="GET" selected>GET</option>
-            <option value="POST">POST</option>
-          </select>
+          <input id="url" value="selfservice" />
         </div>
-        <p class="label small" onclick="toggleAdvanced()">Advanced +</p>
-        <div class="bearerDiv hidden" id="advanced">
-
-          <h3>Authentication</h3>
-
-          <p class="label bearerLabel">Bearer:</p>
-
-          <div class="row">
-            <div class="advancedInput">
-              <p class="label small">Token</p>
-              <input id="token" type="password" />
-            </div>
-          </div>
-
-          <div class="row">
-            <p>
-              or
-            </p>
-          </div>
-          <div class="row">
-            <p class="label bearerLabel">Basic Authentication:</p>
-          </div>
-
-          <div class="row">
-            <div class="advancedInput">
-              <p class="label small">Username</p>
-              <input id="username" type="text" />
-            </div>
-            <div class="advancedInput">
-              <p class="label small">Password</p>
-              <input id="password" type="password" />
-            </div>
-          </div>
-
-          <h3>Headers</h3>
-          <button class="primary" onclick="_addHeader()">+</button>
-          <div id="headers"></div>
+        <p class="label">Client secret:</p>
+        <div class="row">
+          <input id="password" type="password" />
         </div>
-        <div id="dragdrop" class="dragdrop">
-          <b>Or</b> drag & drop a JSON/XML file here
-        </div>
-        <p class="label"><b>Or</b> paste JSON/XML data below:</p>
-        <textarea id="paste" rows="7" cols="50"></textarea>
         <button class="primary" onclick="_next()">Next</button>
         <div class="error"></div>
       </div>
@@ -86,25 +43,7 @@
         <span class="header">JSON/XML Connector</span>
         <span>Select which columns to bring in.</span>
         <div class="tables" id="tables">
-          <div class="table" data-tableid="0">
-            <p class="label">Table Name:</p>
-            <input data-tableid="0" type="text" placeholder="My Data" />
-            <div class="selections">
-              <span
-                ><a onclick="_selectAll(this)" data-tableid="0"
-                  >Select All</a
-                ></span
-              >
-              <span
-                ><a onclick="_clearAll(this)" data-tableid="0"
-                  >Clear All</a
-                ></span
-              >
-            </div>
-            <div class="fields" data-tableid="0">No data fields found</div>
-          </div>
         </div>
-        <button class="secondary" onclick="_addTable()">+ Add Table</button>
         <button class="primary" onclick="_submitDataToTableau()">Submit</button>
         <div class="error"></div>
       </div>
@@ -115,6 +54,7 @@
       style="display: none;"
       aria-hidden="true"
     /><!-- Hit tracker -->
+    <!--
     <script>
       // Catch browser or non-current Desktop users.
       setTimeout(function() {
@@ -132,5 +72,6 @@
         }
       }, 1000);
     </script>
+  -->
   </body>
 </html>

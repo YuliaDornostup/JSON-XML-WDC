@@ -20,6 +20,17 @@ let cachedTableData; // Always a JSON object
 
 let myConnector = tableau.makeConnector();
 
+myConnector.init = async function(initCallback) {
+  tableau.authType = tableau.authTypeEnum.custom;
+
+  if (tableau.phase == tableau.phaseEnum.gatherDataPhase) {
+    var accessToken = await _getToken(tableau.password);
+    tableau.password = accessToken;
+  }
+
+  initCallback();
+};
+
 // Create the schemas for each table
 myConnector.getSchema = function(schemaCallback) {
   console.log("Creating table schemas.");
@@ -33,50 +44,131 @@ myConnector.getSchema = function(schemaCallback) {
   let token = tableau.password;
   let tableSchemas = [];
 
-  _retrieveJsonData(
-    { dataString, dataUrl, method, username, token, headers },
-    function(jsonData) {
-      for (let table in tables) {
-        let tableData = _jsToTable(jsonData, tables[table].fields);
-        let headers = tableData.headers;
-        let cols = [];
-        let aliases = [];
-
-        function findFriendlyName(f, tryNum) {
-          let names = f.split(".");
-          let alias = names
-            .slice(names.length - tryNum, names.length)
-            .join(" ")
-            .replace(/_/g, " ");
-          if (!aliases.includes(alias)) {
-            aliases.push(alias);
-            return alias;
-          } else {
-            return findFriendlyName(f, tryNum + 1);
+  // TODO
+  let jsonData = [
+    {
+      "@odata.context": "https://cloud.uipath.com/amgenrpa/selfservice/orchestrator_/odata/$metadata#Jobs",
+      "@odata.count": 1,
+      "value": [
+          {
+              "Key": "9a514234-32dc-4457-ba03-598a0af3ea42",
+              "StartTime": "2021-10-01T00:07:45.85Z",
+              "EndTime": "2021-10-01T00:07:53.583Z",
+              "State": "Successful",
+              "JobPriority": "Normal",
+              "SpecificPriorityValue": null,
+              "Source": "Agent",
+              "SourceType": "Agent",
+              "BatchExecutionKey": "9a514234-32dc-4457-ba03-598a0af3ea42",
+              "Info": "Job completed",
+              "CreationTime": "2021-10-01T00:07:45.85Z",
+              "StartingScheduleId": null,
+              "ReleaseName": "001_GLOBAL_SimpleTest",
+              "Type": "Attended",
+              "InputArguments": "",
+              "OutputArguments": "{}",
+              "HostMachineName": "USTA445900",
+              "HasMediaRecorded": false,
+              "PersistenceId": null,
+              "ResumeVersion": null,
+              "StopStrategy": null,
+              "RuntimeType": "Development",
+              "RequiresUserInteraction": true,
+              "ReleaseVersionId": 159471,
+              "EntryPointPath": null,
+              "OrganizationUnitId": 616397,
+              "OrganizationUnitFullyQualifiedName": "Research and Development/001_GLOBAL_SimpleTest",
+              "Reference": "",
+              "ProcessType": "Process",
+              "ProfilingOptions": null,
+              "ResumeOnSameContext": false,
+              "LocalSystemAccount": "autogen\\snakka02@amgen.com_local",
+              "OrchestratorUserIdentity": null,
+              "Id": 10325449
           }
-        }
-
-        for (let field in headers) {
-          cols.push({
-            id: field.replace(/\$/g, "attr").replace(/[^A-Za-z0-9_]/g, "_"),
-            alias: findFriendlyName(field, 1),
-            dataType: headers[field]
-          });
-        }
-
-        let tableSchema = {
-          id: table,
-          alias: tables[table].alias,
-          columns: cols
-        };
-        tableSchemas.push(tableSchema);
-        console.log("Table schema created: ", tableSchema);
-      }
-
-      schemaCallback(tableSchemas);
+      ]
+    },
+    {
+      "@odata.context": "https://cloud.uipath.com/amgenrpa/SelfService/orchestrator_/odata/$metadata#NamedUserLicenses",
+      "@odata.count": 1,
+      "value": [
+          {
+              "Key": "am\\agunaydi",
+              "UserName": "am\\agunaydi",
+              "LastLoginDate": "2022-02-22T10:51:26.127Z",
+              "MachinesCount": 1,
+              "IsLicensed": false,
+              "IsExternalLicensed": false,
+              "ActiveRobotId": null,
+              "MachineNames": [
+                  "WINDOWS-HBLCVFS"
+              ],
+              "ActiveMachineNames": []
+          }
+      ]
     }
-  );
+  ];
+
+  for (let table in tables) {
+    let tableData = _jsToTable(jsonData[table], tables[table].fields);
+    let headers = tableData.headers;
+    let cols = [];
+    let aliases = [];
+
+    function findFriendlyName(f, tryNum) {
+      let names = f.split(".");
+      let alias = names
+        .slice(names.length - tryNum, names.length)
+        .join(" ")
+        .replace(/_/g, " ");
+      if (!aliases.includes(alias)) {
+        aliases.push(alias);
+        return alias;
+      } else {
+        return findFriendlyName(f, tryNum + 1);
+      }
+    }
+
+    for (let field in headers) {
+      cols.push({
+        id: field.replace(/\$/g, "attr").replace(/[^A-Za-z0-9_]/g, "_"),
+        alias: findFriendlyName(field, 1),
+        dataType: headers[field]
+      });
+    }
+
+    let tableSchema = {
+      id: table,
+      alias: tables[table].alias,
+      columns: cols
+    };
+    tableSchemas.push(tableSchema);
+    console.log("Table schema created: ", tableSchema);
+  }
+
+  schemaCallback(tableSchemas);
 };
+
+function _fillTable(table, tableDef, rawData) {
+  let tableData = _jsToTable(rawData, tableDef.fields);
+  let newRows = [];
+  for (let row of tableData.rows) {
+    let newRow = {};
+    for (let prop in row) {
+      newRow[prop.replace(/\$/g, "attr").replace(/[^A-Za-z0-9_]/g, "_")] =
+        row[prop];
+    }
+    newRows.push(newRow);
+  }
+
+  let row_index = 0;
+  let size = 10000;
+  while (row_index < newRows.length) {
+    table.appendRows(newRows.slice(row_index, size + row_index));
+    row_index += size;
+    tableau.reportProgress("Getting row: " + row_index);
+  }
+}
 
 // Get the data for each table
 myConnector.getData = function(table, doneCallback) {
@@ -91,29 +183,69 @@ myConnector.getData = function(table, doneCallback) {
   let token = tableau.password;
   let tableSchemas = [];
 
-  _retrieveJsonData({ dataString, dataUrl, method, username, token, headers }, function(
-    rawData
+  // TODO
+  let foldersUrl = "https://cloud.uipath.com/amgenrpa/" + dataUrl + "/orchestrator_/odata/Folders";
+
+  let jobsUrl = "https://cloud.uipath.com/amgenrpa/" + dataUrl + "/orchestrator_/odata/Jobs";
+
+  let licenses = [
+    "NonProduction",
+    "Attended",
+    "Unattended",
+    "Studio",
+    "Development",
+    "RpaDeveloper",
+    "StudioX",
+    "CitizenDeveloper",
+    "Headless",
+    "RpaDeveloperPro",
+    "StudioPro",
+    "TestAutomation",
+    "AutomationCloud",
+    "Serverless"
+  ];
+  let licensesUrls = licenses.map(function(x) {
+    return "https://cloud.uipath.com/amgenrpa/" + dataUrl + "/odata/LicensesNamedUser/UiPath.Server.Configuration.OData.GetLicensesNamedUser(robotType='" + x + "')";
+  });
+
+  _retrieveJsonData({ dataString, dataUrl: foldersUrl, method: "GET", username, token, headers }, function(
+    foldersData
   ) {
+
     let currentTable = table.tableInfo.id;
     console.log("Getting data for table " + currentTable);
 
-    let tableData = _jsToTable(rawData, tables[currentTable].fields);
-    let newRows = [];
-    for (let row of tableData.rows) {
-      let newRow = {};
-      for (let prop in row) {
-        newRow[prop.replace(/\$/g, "attr").replace(/[^A-Za-z0-9_]/g, "_")] =
-          row[prop];
+    if (currentTable == "jobs") {
+      let folders = foldersData["value"];
+      for (const folder of folders) {
+        let jobsHeaders = {
+          "Content-Type": "application/json",
+          "X-UIPATH-OrganizationUnitId": folder["Id"]
+        };
+  
+        _retrieveJsonData({ dataString, dataUrl: jobsUrl, method: "GET", username, token, headers: jobsHeaders }, function(
+          jobsData
+        ) {
+          _fillTable(table, tables[currentTable], jobsData);
+        });
       }
-      newRows.push(newRow);
     }
-
-    let row_index = 0;
-    let size = 10000;
-    while (row_index < newRows.length) {
-      table.appendRows(newRows.slice(row_index, size + row_index));
-      row_index += size;
-      tableau.reportProgress("Getting row: " + row_index);
+    else if (currentTable == "licenses") {
+      for (const licensesUrl of licensesUrls) {
+        let licensesHeaders = {
+          "Content-Type": "application/json"
+        };
+  
+        _retrieveJsonData({ dataString, dataUrl: licensesUrl, method: "GET", username, token, headers: licensesHeaders }, function(
+          licensesData
+        ) {
+          _fillTable(table, tables[currentTable], licensesData);
+        });
+      }
+    }
+    else {
+      console.log("Unknown table: " + currentTable);
+      _error("Unknown table: " + currentTable);
     }
 
     doneCallback();
@@ -125,6 +257,34 @@ tableau.registerConnector(myConnector);
 window._tableau.triggerInitialization &&
   window._tableau.triggerInitialization(); // Make sure WDC is initialized properly
 
+async function _getToken(secret) {
+  var url = "https://cloud.uipath.com/identity_/connect/token";
+
+  var headers = {
+    "Content-Type": "application/x-www-form-urlencoded"
+  };
+
+  var data = {
+    "grant_type": "client_credentials",
+    "client_id": "073481db-7be1-4ee7-be28-cf529ad3285a",
+    "client_secret": secret,
+    "scope": "OR.Folders.Read OR.Jobs.Read OR.License.Read"
+  };
+
+  var method = "POST";
+
+  let result = await $.post("/proxy/" + url, {
+    method,
+    headers,
+    data
+  });
+
+  console.log(JSON.stringify(result));
+  var accessToken = JSON.parse(result.body)["access_token"];
+
+  return accessToken;
+}
+
 // Gets data from URL or string. Inputs are all strings. Always returns JSON data, even if XML input.
 async function _retrieveJsonData(
   { dataString, dataUrl, method, username, token, headers },
@@ -132,7 +292,7 @@ async function _retrieveJsonData(
 ) {
   let rawData = dataString;
 
-  if (!cachedTableData) {
+  if (!cachedTableData || true) {
     if (dataUrl) {
       let result = await $.post("/proxy/" + dataUrl, {
         method,
@@ -334,7 +494,7 @@ function _pathsToTree(paths) {
   return result;
 }
 
-function _addTable() {
+function _addTable(tableName) {
   let tableID = 0; // Scan highest table id number then +1
   $("input[data-tableid]").each(function() {
     tableID =
@@ -346,8 +506,7 @@ function _addTable() {
     <div class="table" data-tableid="${tableID}">
       <p class="label">Table Name</p>
       <div class="row">
-        <input data-tableid="${tableID}" type="text" placeholder="My Data (${tableID +
-    1})"/>
+        <input data-tableid="${tableID}" type="text" value="${tableName}"/>
         <button class="delete" data-tableid="${tableID}" onclick="_deleteTable(this)">Delete</button>
       </div>
       <div class="selections">
@@ -369,7 +528,7 @@ function _deleteTable(e) {
 }
 
 // Switches to field input form and displays potential fields
-async function _askForFields(tableID) {
+async function _askForFields(tableID, rawData) {
   let conData = JSON.parse(tableau.connectionData);
   let dataString = conData.dataString;
   let dataUrl = conData.dataUrl;
@@ -381,11 +540,7 @@ async function _askForFields(tableID) {
   let div = $(".fields[data-tableid=" + tableID + "]");
   let fieldsTree;
 
-  await _retrieveJsonData({ dataString, dataUrl, method, username, token, headers }, function(
-    rawData
-  ) {
-    fieldsTree = _pathsToTree(_objectToPaths(rawData));
-  });
+  fieldsTree = _pathsToTree(_objectToPaths(rawData));
 
   if (!fieldsTree) return;
 
@@ -588,14 +743,14 @@ function _removeHeader(headerIndex) {
 
 // Takes data, does basic vaildation and goes to field selection phase
 function _next(dataString) {
-  dataString = (dataString || $("#paste").val()).trim();
+  dataString = "";
   let dataUrl = $("#url")
     .val()
     .trim();
   let method = $("#method").val();
   let token = $("#token").val();
   let username = $("#username").val();
-  let password = $("#password").val();
+  let password = tableau.password || $("#password").val();
 
   let headers = { };
   $("#headers .row").each(function() {
@@ -626,18 +781,79 @@ function _next(dataString) {
     }
   }
 
-  if (dataUrl) {
-    const urlRegex = /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i;
-    const result = dataUrl.match(urlRegex);
-    if (result === null) return _error("URL is not valid.");
-  }
-
   if (dataString) dataString = _checkJSONFormat(dataString);
   tableau.connectionData = JSON.stringify({ dataString, dataUrl, method, headers });
   tableau.username = username;
   tableau.password = token || password;
 
-  _askForFields(0);
+  let jobsData = {
+    "@odata.context": "https://cloud.uipath.com/amgenrpa/selfservice/orchestrator_/odata/$metadata#Jobs",
+    "@odata.count": 1,
+    "value": [
+        {
+            "Key": "9a514234-32dc-4457-ba03-598a0af3ea42",
+            "StartTime": "2021-10-01T00:07:45.85Z",
+            "EndTime": "2021-10-01T00:07:53.583Z",
+            "State": "Successful",
+            "JobPriority": "Normal",
+            "SpecificPriorityValue": null,
+            "Source": "Agent",
+            "SourceType": "Agent",
+            "BatchExecutionKey": "9a514234-32dc-4457-ba03-598a0af3ea42",
+            "Info": "Job completed",
+            "CreationTime": "2021-10-01T00:07:45.85Z",
+            "StartingScheduleId": null,
+            "ReleaseName": "001_GLOBAL_SimpleTest",
+            "Type": "Attended",
+            "InputArguments": "",
+            "OutputArguments": "{}",
+            "HostMachineName": "USTA445900",
+            "HasMediaRecorded": false,
+            "PersistenceId": null,
+            "ResumeVersion": null,
+            "StopStrategy": null,
+            "RuntimeType": "Development",
+            "RequiresUserInteraction": true,
+            "ReleaseVersionId": 159471,
+            "EntryPointPath": null,
+            "OrganizationUnitId": 616397,
+            "OrganizationUnitFullyQualifiedName": "Research and Development/001_GLOBAL_SimpleTest",
+            "Reference": "",
+            "ProcessType": "Process",
+            "ProfilingOptions": null,
+            "ResumeOnSameContext": false,
+            "LocalSystemAccount": "autogen\\snakka02@amgen.com_local",
+            "OrchestratorUserIdentity": null,
+            "Id": 10325449
+        }
+    ]
+  };
+
+  let licensesData = {
+    "@odata.context": "https://cloud.uipath.com/amgenrpa/SelfService/orchestrator_/odata/$metadata#NamedUserLicenses",
+    "@odata.count": 1,
+    "value": [
+        {
+            "Key": "am\\agunaydi",
+            "UserName": "am\\agunaydi",
+            "LastLoginDate": "2022-02-22T10:51:26.127Z",
+            "MachinesCount": 1,
+            "IsLicensed": false,
+            "IsExternalLicensed": false,
+            "ActiveRobotId": null,
+            "MachineNames": [
+                "WINDOWS-HBLCVFS"
+            ],
+            "ActiveMachineNames": []
+        }
+    ]
+  };
+
+  _addTable("jobs");
+  _askForFields(1, jobsData);
+
+  _addTable("licenses");
+  _askForFields(2, licensesData);
 }
 
 // Shows error message below submit button
