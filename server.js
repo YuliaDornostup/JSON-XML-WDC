@@ -18,9 +18,14 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
 });
 
+app.post("/log", async (req, res) => {
+  console.log('[' + new Date() + '] ' + req.body.log);
+  res.send({});
+});
+
 app.post("/proxy/*", async (req, res) => {
   const url = req.url.split("/proxy/")[1];
-  console.log('Executing request: URL=' + url + " ; method=" + req.body.method);
+  console.log('[' + new Date() + '] Executing request: URL=' + url + " ; method=" + req.body.method);
 
   let options = {
     method: req.body.method
@@ -43,6 +48,7 @@ app.post("/proxy/*", async (req, res) => {
   try {
     const response = await fetch(url, options);
     if (response.ok) {
+      console.log('[' + new Date() + '] Executing request: URL=' + url + " ; method=" + req.body.method + " OK!");
       const body = await response.text();
       res.send({ body });
     } else {

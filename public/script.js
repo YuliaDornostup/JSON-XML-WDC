@@ -47,6 +47,28 @@ myConnector.getSchema = function(schemaCallback) {
   // TODO
   let jsonData = [
     {
+      //folders
+      "@odata.context": "https://cloud.uipath.com/amgenrpa/selfservice/orchestrator_/odata/$metadata#Folders",
+      "@odata.count": 75,
+      "value": [
+        {
+            "Key": "b3996f91-67e6-4a27-8522-63281333ff06",
+            "DisplayName": "Shared",
+            "FullyQualifiedName": "Shared",
+            "FullyQualifiedNameOrderable": "Shared",
+            "Description": null,
+            "ProvisionType": "Automatic",
+            "PermissionModel": "FineGrained",
+            "ParentId": null,
+            "ParentKey": null,
+            "IsActive": true,
+            "FeedType": "Processes",
+            "Id": 342038
+        }
+      ]
+    },
+    {
+      //jobs
       "@odata.context": "https://cloud.uipath.com/amgenrpa/selfservice/orchestrator_/odata/$metadata#Jobs",
       "@odata.count": 1,
       "value": [
@@ -89,6 +111,7 @@ myConnector.getSchema = function(schemaCallback) {
       ]
     },
     {
+      //licenses
       "@odata.context": "https://cloud.uipath.com/amgenrpa/SelfService/orchestrator_/odata/$metadata#NamedUserLicenses",
       "@odata.count": 1,
       "value": [
@@ -103,7 +126,8 @@ myConnector.getSchema = function(schemaCallback) {
               "MachineNames": [
                   "WINDOWS-HBLCVFS"
               ],
-              "ActiveMachineNames": []
+              "ActiveMachineNames": [],
+              "LicenseType": null
           }
       ]
     }
@@ -149,30 +173,44 @@ myConnector.getSchema = function(schemaCallback) {
   schemaCallback(tableSchemas);
 };
 
-function _fillTable(table, tableDef, rawData) {
+function _serverLog(log) {
+  $.post("/log" , {
+    log
+  });
+}
+
+function _fillTable(appendRows, tableDef, rawData, initRow) {
   let tableData = _jsToTable(rawData, tableDef.fields);
   let newRows = [];
+  console.log(initRow);
   for (let row of tableData.rows) {
-    let newRow = {};
+    let newRow = {...initRow};
+
     for (let prop in row) {
-      newRow[prop.replace(/\$/g, "attr").replace(/[^A-Za-z0-9_]/g, "_")] =
-        row[prop];
+      if (!newRow[prop.replace(/\$/g, "attr").replace(/[^A-Za-z0-9_]/g, "_")]) {
+        newRow[prop.replace(/\$/g, "attr").replace(/[^A-Za-z0-9_]/g, "_")] = row[prop];
+      }
     }
+    console.log(initRow);
     newRows.push(newRow);
   }
 
   let row_index = 0;
   let size = 10000;
   while (row_index < newRows.length) {
-    table.appendRows(newRows.slice(row_index, size + row_index));
+    _serverLog("New rows: " + newRows.length);
+    appendRows(newRows.slice(row_index, size + row_index));
     row_index += size;
-    tableau.reportProgress("Getting row: " + row_index);
+
+    let log = "Getting row: " + row_index;
+    _serverLog(log);
+    tableau.reportProgress(log);
   }
 }
 
 // Get the data for each table
-myConnector.getData = function(table, doneCallback) {
-  console.log("Getting data.");
+myConnector.getData = async function(table, doneCallback) {
+  console.log("Phase: getData");
   let conData = JSON.parse(tableau.connectionData);
   let dataString = conData.dataString;
   let dataUrl = conData.dataUrl;
@@ -189,67 +227,90 @@ myConnector.getData = function(table, doneCallback) {
   let jobsUrl = "https://cloud.uipath.com/amgenrpa/" + dataUrl + "/orchestrator_/odata/Jobs";
 
   let licenses = [
-    "NonProduction",
+    //"NonProduction",
     "Attended",
     "Unattended",
-    "Studio",
-    "Development",
-    "RpaDeveloper",
-    "StudioX",
-    "CitizenDeveloper",
+    //--"Studio",
+    "Development", //RpaDeveloper
+    //--"RpaDeveloper",
+    "StudioX", //Citizen Developer
+    //--"CitizenDeveloper",
     "Headless",
-    "RpaDeveloperPro",
-    "StudioPro",
-    "TestAutomation",
-    "AutomationCloud",
-    "Serverless"
+    //--"RpaDeveloperPro",
+    "StudioPro", //Automation Developer
+    //"TestAutomation",
+    //"AutomationCloud",
+    //"Serverless"
   ];
   let licensesUrls = licenses.map(function(x) {
     return "https://cloud.uipath.com/amgenrpa/" + dataUrl + "/odata/LicensesNamedUser/UiPath.Server.Configuration.OData.GetLicensesNamedUser(robotType='" + x + "')";
   });
 
-  _retrieveJsonData({ dataString, dataUrl: foldersUrl, method: "GET", username, token, headers }, function(
-    foldersData
-  ) {
 
-    let currentTable = table.tableInfo.id;
-    console.log("Getting data for table " + currentTable);
+  let currentTable = table.tableInfo.id;
+  console.log("Getting data for table: " + currentTable);
 
-    if (currentTable == "jobs") {
+  if (currentTable == "folders") {
+    let foldersHeaders = {
+      "Content-Type": "application/json"
+    };
+
+    await _retrieveJsonData({ dataString, dataUrl: foldersUrl, method: "GET", username, token, headers: foldersHeaders }, async function(
+      foldersData2
+    ) {
+      _fillTable(table.appendRows, tables[currentTable], foldersData2, {});
+      doneCallback();
+    });
+  }
+  else if (currentTable == "jobs") {
+    await _retrieveJsonData({ dataString, dataUrl: foldersUrl, method: "GET", username, token, headers }, async function(
+      foldersData
+    ) {
+
       let folders = foldersData["value"];
-      for (const folder of folders) {
+      for (const i in folders) {
         let jobsHeaders = {
           "Content-Type": "application/json",
-          "X-UIPATH-OrganizationUnitId": folder["Id"]
+          "X-UIPATH-OrganizationUnitId": folders[i]["Id"]
         };
-  
-        _retrieveJsonData({ dataString, dataUrl: jobsUrl, method: "GET", username, token, headers: jobsHeaders }, function(
+        
+        await _retrieveJsonData({ dataString, dataUrl: jobsUrl, method: "GET", username, token, headers: jobsHeaders }, async function(
           jobsData
         ) {
-          _fillTable(table, tables[currentTable], jobsData);
-        });
-      }
-    }
-    else if (currentTable == "licenses") {
-      for (const licensesUrl of licensesUrls) {
-        let licensesHeaders = {
-          "Content-Type": "application/json"
-        };
-  
-        _retrieveJsonData({ dataString, dataUrl: licensesUrl, method: "GET", username, token, headers: licensesHeaders }, function(
-          licensesData
-        ) {
-          _fillTable(table, tables[currentTable], licensesData);
-        });
-      }
-    }
-    else {
-      console.log("Unknown table: " + currentTable);
-      _error("Unknown table: " + currentTable);
-    }
 
-    doneCallback();
-  });
+          _fillTable(table.appendRows, tables[currentTable], jobsData, {});
+
+          if (i == (folders.length - 1)) { 
+            doneCallback();
+          }
+        });
+      }
+
+    });
+  }
+  else if (currentTable == "licenses") {
+    for (const i in licensesUrls) {
+      let licensesHeaders = {
+        "Content-Type": "application/json"
+      };
+
+      await _retrieveJsonData({ dataString, dataUrl: licensesUrls[i], method: "GET", username, token, headers: licensesHeaders }, async function(
+        licensesData
+      ) {
+
+        _fillTable(table.appendRows, tables[currentTable], licensesData, { value_LicenseType: licenses[i] });
+        console.log("license " + i)
+        if (i == (licensesUrls.length - 1)) { 
+            doneCallback();
+        }
+      });
+    }
+  }
+  else {
+    console.log("Unknown table: " + currentTable);
+    _error("Unknown table: " + currentTable);
+  }
+  //  doneCallback();
 };
 
 tableau.connectionName = "JSON/XML Data";
@@ -279,7 +340,6 @@ async function _getToken(secret) {
     data
   });
 
-  console.log(JSON.stringify(result));
   var accessToken = JSON.parse(result.body)["access_token"];
 
   return accessToken;
@@ -290,18 +350,21 @@ async function _retrieveJsonData(
   { dataString, dataUrl, method, username, token, headers },
   retrieveDataCallback
 ) {
+  console.log("Starting _retrieveJsonData")
   let rawData = dataString;
-
   if (!cachedTableData || true) {
     if (dataUrl) {
+      console.error("step 2");
       let result = await $.post("/proxy/" + dataUrl, {
         method,
         username,
         token,
         headers
       });
-      
+      console.error("step 3");
+
       if (result.error) {
+        console.error(result.error+"...");
         if (tableau.phase !== "interactive") {
           console.error(result.error);
           tableau.abortWithError(result.error);
@@ -844,16 +907,41 @@ function _next(dataString) {
             "MachineNames": [
                 "WINDOWS-HBLCVFS"
             ],
-            "ActiveMachineNames": []
+            "ActiveMachineNames": [],
+            "LicenseType": null
         }
     ]
   };
 
+  let foldersData = {
+    "@odata.context": "https://cloud.uipath.com/amgenrpa/selfservice/orchestrator_/odata/$metadata#Folders",
+    "@odata.count": 75,
+    "value": [
+        {
+            "Key": "b3996f91-67e6-4a27-8522-63281333ff06",
+            "DisplayName": "Shared",
+            "FullyQualifiedName": "Shared",
+            "FullyQualifiedNameOrderable": "Shared",
+            "Description": null,
+            "ProvisionType": "Automatic",
+            "PermissionModel": "FineGrained",
+            "ParentId": null,
+            "ParentKey": null,
+            "IsActive": true,
+            "FeedType": "Processes",
+            "Id": 342038
+        }
+    ]
+  };
+
+  _addTable("folders");
+  _askForFields(1, foldersData);
+
   _addTable("jobs");
-  _askForFields(1, jobsData);
+  _askForFields(2, jobsData);
 
   _addTable("licenses");
-  _askForFields(2, licensesData);
+  _askForFields(3, licensesData);
 }
 
 // Shows error message below submit button
