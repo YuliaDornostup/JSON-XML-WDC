@@ -48,88 +48,104 @@ myConnector.getSchema = function(schemaCallback) {
   let jsonData = [
     {
       //folders
-      "@odata.context": "https://cloud.uipath.com/amgenrpa/selfservice/orchestrator_/odata/$metadata#Folders",
-      "@odata.count": 75,
       "value": [
-        {
-            "Key": "b3996f91-67e6-4a27-8522-63281333ff06",
-            "DisplayName": "Shared",
-            "FullyQualifiedName": "Shared",
-            "FullyQualifiedNameOrderable": "Shared",
-            "Description": null,
-            "ProvisionType": "Automatic",
-            "PermissionModel": "FineGrained",
-            "ParentId": null,
-            "ParentKey": null,
-            "IsActive": true,
-            "FeedType": "Processes",
-            "Id": 342038
+          {
+          "Key": "b3996f91-67e6-4a27-8522-63281333ff06",
+          "DisplayName": "Shared",
+          "FullyQualifiedName": "Shared",
+          "FullyQualifiedNameOrderable": "Shared",
+          "Description": null,
+          "ProvisionType": "Automatic",
+          "PermissionModel": "FineGrained",
+          "ParentId": null,
+          "ParentKey": null,
+          "IsActive": true,
+          "FeedType": "Processes",
+          "Id": 342038
         }
       ]
     },
     {
-      //jobs
-      "@odata.context": "https://cloud.uipath.com/amgenrpa/selfservice/orchestrator_/odata/$metadata#Jobs",
-      "@odata.count": 1,
       "value": [
-          {
-              "Key": "9a514234-32dc-4457-ba03-598a0af3ea42",
-              "StartTime": "2021-10-01T00:07:45.85Z",
-              "EndTime": "2021-10-01T00:07:53.583Z",
-              "State": "Successful",
-              "JobPriority": "Normal",
-              "SpecificPriorityValue": null,
-              "Source": "Agent",
-              "SourceType": "Agent",
-              "BatchExecutionKey": "9a514234-32dc-4457-ba03-598a0af3ea42",
-              "Info": "Job completed",
-              "CreationTime": "2021-10-01T00:07:45.85Z",
-              "StartingScheduleId": null,
-              "ReleaseName": "001_GLOBAL_SimpleTest",
-              "Type": "Attended",
-              "InputArguments": "",
-              "OutputArguments": "{}",
-              "HostMachineName": "USTA445900",
-              "HasMediaRecorded": false,
-              "PersistenceId": null,
-              "ResumeVersion": null,
-              "StopStrategy": null,
-              "RuntimeType": "Development",
-              "RequiresUserInteraction": true,
-              "ReleaseVersionId": 159471,
-              "EntryPointPath": null,
-              "OrganizationUnitId": 616397,
-              "OrganizationUnitFullyQualifiedName": "Research and Development/001_GLOBAL_SimpleTest",
-              "Reference": "",
-              "ProcessType": "Process",
-              "ProfilingOptions": null,
-              "ResumeOnSameContext": false,
-              "LocalSystemAccount": "autogen\\snakka02@amgen.com_local",
-              "OrchestratorUserIdentity": null,
-              "Id": 10325449
-          }
+        {
+          "Key": "9a514234-32dc-4457-ba03-598a0af3ea42",
+          "StartTime": "2021-10-01T00:07:45.85Z",
+          "EndTime": "2021-10-01T00:07:53.583Z",
+          "State": "Successful",
+          "JobPriority": "Normal",
+          "SpecificPriorityValue": null,
+          "Source": "Agent",
+          "SourceType": "Agent",
+          "BatchExecutionKey": "9a514234-32dc-4457-ba03-598a0af3ea42",
+          "Info": "Job completed",
+          "CreationTime": "2021-10-01T00:07:45.85Z",
+          "StartingScheduleId": null,
+          "ReleaseName": "001_GLOBAL_SimpleTest",
+          "Type": "Attended",
+          "InputArguments": "",
+          "OutputArguments": "{}",
+          "HostMachineName": "USTA445900",
+          "HasMediaRecorded": false,
+          "PersistenceId": null,
+          "ResumeVersion": null,
+          "StopStrategy": null,
+          "RuntimeType": "Development",
+          "RequiresUserInteraction": true,
+          "ReleaseVersionId": 159471,
+          "EntryPointPath": null,
+          "OrganizationUnitId": 616397,
+          "OrganizationUnitFullyQualifiedName": "Research and Development/001_GLOBAL_SimpleTest",
+          "Reference": "",
+          "ProcessType": "Process",
+          "ProfilingOptions": null,
+          "ResumeOnSameContext": false,
+          "LocalSystemAccount": "autogen\\snakka02@amgen.com_local",
+          "OrchestratorUserIdentity": null,
+          "Id": 10325449,
+          "Tenant": null
+        }
       ]
     },
     {
-      //licenses
-      "@odata.context": "https://cloud.uipath.com/amgenrpa/SelfService/orchestrator_/odata/$metadata#NamedUserLicenses",
-      "@odata.count": 1,
       "value": [
-          {
-              "Key": "am\\agunaydi",
-              "UserName": "am\\agunaydi",
-              "LastLoginDate": "2022-02-22T10:51:26.127Z",
-              "MachinesCount": 1,
-              "IsLicensed": false,
-              "IsExternalLicensed": false,
-              "ActiveRobotId": null,
-              "MachineNames": [
-                  "WINDOWS-HBLCVFS"
-              ],
-              "ActiveMachineNames": [],
-              "LicenseType": null
-          }
+        {
+          "Key": "am\\agunaydi",
+          "UserName": "am\\agunaydi",
+          "LastLoginDate": "2022-02-22T10:51:26.127Z",
+          "MachinesCount": 1,
+          "IsLicensed": false,
+          "IsExternalLicensed": false,
+          "ActiveRobotId": null,
+          "LicenseType": null,
+          "Tenant": null
+        }
       ]
+    },
+    {
+      "ExpireDate": 1654041599,
+      "Allowed": {
+          "Headless": 0,
+          "StudioX": 300,
+          "Attended": 0,
+          "Unattended": 0,
+          "NonProduction": 0,
+          "Development": 0,
+          "StudioPro": 2,
+          "TestAutomation": 0,
+          "AutomationCloud": 0
+      },
+      "Used": {
+          "Headless": 0,
+          "StudioX": 118,
+          "Attended": 1,
+          "Unattended": 0,
+          "NonProduction": 0,
+          "Development": 0,
+          "StudioPro": 3,
+          "TestAutomation": 0,
+          "AutomationCloud": 0
+      },
+      "Tenant": null
     }
   ];
 
@@ -182,7 +198,7 @@ function _serverLog(log) {
 function _fillTable(appendRows, tableDef, rawData, initRow) {
   let tableData = _jsToTable(rawData, tableDef.fields);
   let newRows = [];
-  console.log(initRow);
+  //console.log(initRow);
   for (let row of tableData.rows) {
     let newRow = {...initRow};
 
@@ -245,7 +261,8 @@ myConnector.getData = async function(table, doneCallback) {
   let licensesUrls = licenses.map(function(x) {
     return "https://cloud.uipath.com/amgenrpa/" + dataUrl + "/odata/LicensesNamedUser/UiPath.Server.Configuration.OData.GetLicensesNamedUser(robotType='" + x + "')";
   });
-
+ 
+  let totalLicensesUrl = "https://cloud.uipath.com/amgenrpa/" + dataUrl + "/odata/Settings/UiPath.Server.Configuration.OData.GetLicense";
 
   let currentTable = table.tableInfo.id;
   console.log("Getting data for table: " + currentTable);
@@ -258,7 +275,7 @@ myConnector.getData = async function(table, doneCallback) {
     await _retrieveJsonData({ dataString, dataUrl: foldersUrl, method: "GET", username, token, headers: foldersHeaders }, async function(
       foldersData2
     ) {
-      _fillTable(table.appendRows, tables[currentTable], foldersData2, {});
+      _fillTable(table.appendRows, tables[currentTable], foldersData2, {value_Tenant: dataUrl});
       doneCallback();
     });
   }
@@ -278,7 +295,7 @@ myConnector.getData = async function(table, doneCallback) {
           jobsData
         ) {
 
-          _fillTable(table.appendRows, tables[currentTable], jobsData, {});
+          _fillTable(table.appendRows, tables[currentTable], jobsData, {value_Tenant: dataUrl});
 
           if (i == (folders.length - 1)) { 
             doneCallback();
@@ -297,15 +314,28 @@ myConnector.getData = async function(table, doneCallback) {
       await _retrieveJsonData({ dataString, dataUrl: licensesUrls[i], method: "GET", username, token, headers: licensesHeaders }, async function(
         licensesData
       ) {
-
-        _fillTable(table.appendRows, tables[currentTable], licensesData, { value_LicenseType: licenses[i] });
-        console.log("license " + i)
+        _fillTable(table.appendRows, tables[currentTable], licensesData, { value_LicenseType: licenses[i], value_Tenant: dataUrl });
+        console.log("license " + i )
         if (i == (licensesUrls.length - 1)) { 
             doneCallback();
         }
       });
     }
   }
+  else if (currentTable == "totalLicenses") {
+    let totalLicensesHeaders = {
+      "Content-Type": "application/json"
+    };
+
+    await _retrieveJsonData({ dataString, dataUrl: totalLicensesUrl, method: "GET", username, token, headers: totalLicensesHeaders }, async function(
+      totalLicensesData
+    ) {
+      _fillTable(table.appendRows, tables[currentTable], totalLicensesData, {Tenant: dataUrl});
+      _serverLog("done?")
+      doneCallback();
+      _serverLog("now?")
+    });
+  } 
   else {
     console.log("Unknown table: " + currentTable);
     _error("Unknown table: " + currentTable);
@@ -329,7 +359,7 @@ async function _getToken(secret) {
     "grant_type": "client_credentials",
     "client_id": "073481db-7be1-4ee7-be28-cf529ad3285a",
     "client_secret": secret,
-    "scope": "OR.Folders.Read OR.Jobs.Read OR.License.Read"
+    "scope": "OR.Folders.Read OR.Jobs.Read OR.License.Read OR.Administration.Read OR.Analytics.Read OR.Assets.Read OR.Audit.Read OR.BackgroundTasks.Read OR.Execution.Read OR.Hypervisor.Read OR.Machines.Read OR.Monitoring.Read OR.Queues.Read OR.Robots.Read OR.Settings.Read OR.Tasks.Read OR.Users.Read"
   };
 
   var method = "POST";
@@ -354,14 +384,12 @@ async function _retrieveJsonData(
   let rawData = dataString;
   if (!cachedTableData || true) {
     if (dataUrl) {
-      console.error("step 2");
       let result = await $.post("/proxy/" + dataUrl, {
         method,
         username,
         token,
         headers
       });
-      console.error("step 3");
 
       if (result.error) {
         console.error(result.error+"...");
@@ -850,88 +878,108 @@ function _next(dataString) {
   tableau.password = token || password;
 
   let jobsData = {
-    "@odata.context": "https://cloud.uipath.com/amgenrpa/selfservice/orchestrator_/odata/$metadata#Jobs",
-    "@odata.count": 1,
     "value": [
-        {
-            "Key": "9a514234-32dc-4457-ba03-598a0af3ea42",
-            "StartTime": "2021-10-01T00:07:45.85Z",
-            "EndTime": "2021-10-01T00:07:53.583Z",
-            "State": "Successful",
-            "JobPriority": "Normal",
-            "SpecificPriorityValue": null,
-            "Source": "Agent",
-            "SourceType": "Agent",
-            "BatchExecutionKey": "9a514234-32dc-4457-ba03-598a0af3ea42",
-            "Info": "Job completed",
-            "CreationTime": "2021-10-01T00:07:45.85Z",
-            "StartingScheduleId": null,
-            "ReleaseName": "001_GLOBAL_SimpleTest",
-            "Type": "Attended",
-            "InputArguments": "",
-            "OutputArguments": "{}",
-            "HostMachineName": "USTA445900",
-            "HasMediaRecorded": false,
-            "PersistenceId": null,
-            "ResumeVersion": null,
-            "StopStrategy": null,
-            "RuntimeType": "Development",
-            "RequiresUserInteraction": true,
-            "ReleaseVersionId": 159471,
-            "EntryPointPath": null,
-            "OrganizationUnitId": 616397,
-            "OrganizationUnitFullyQualifiedName": "Research and Development/001_GLOBAL_SimpleTest",
-            "Reference": "",
-            "ProcessType": "Process",
-            "ProfilingOptions": null,
-            "ResumeOnSameContext": false,
-            "LocalSystemAccount": "autogen\\snakka02@amgen.com_local",
-            "OrchestratorUserIdentity": null,
-            "Id": 10325449
-        }
+      {
+        "Key": "9a514234-32dc-4457-ba03-598a0af3ea42",
+        "StartTime": "2021-10-01T00:07:45.85Z",
+        "EndTime": "2021-10-01T00:07:53.583Z",
+        "State": "Successful",
+        "JobPriority": "Normal",
+        "SpecificPriorityValue": null,
+        "Source": "Agent",
+        "SourceType": "Agent",
+        "BatchExecutionKey": "9a514234-32dc-4457-ba03-598a0af3ea42",
+        "Info": "Job completed",
+        "CreationTime": "2021-10-01T00:07:45.85Z",
+        "StartingScheduleId": null,
+        "ReleaseName": "001_GLOBAL_SimpleTest",
+        "Type": "Attended",
+        "InputArguments": "",
+        "OutputArguments": "{}",
+        "HostMachineName": "USTA445900",
+        "HasMediaRecorded": false,
+        "PersistenceId": null,
+        "ResumeVersion": null,
+        "StopStrategy": null,
+        "RuntimeType": "Development",
+        "RequiresUserInteraction": true,
+        "ReleaseVersionId": 159471,
+        "EntryPointPath": null,
+        "OrganizationUnitId": 616397,
+        "OrganizationUnitFullyQualifiedName": "Research and Development/001_GLOBAL_SimpleTest",
+        "Reference": "",
+        "ProcessType": "Process",
+        "ProfilingOptions": null,
+        "ResumeOnSameContext": false,
+        "LocalSystemAccount": "autogen\\snakka02@amgen.com_local",
+        "OrchestratorUserIdentity": null,
+        "Id": 10325449,
+        "Tenant": null
+      }
     ]
   };
 
   let licensesData = {
-    "@odata.context": "https://cloud.uipath.com/amgenrpa/SelfService/orchestrator_/odata/$metadata#NamedUserLicenses",
-    "@odata.count": 1,
     "value": [
-        {
-            "Key": "am\\agunaydi",
-            "UserName": "am\\agunaydi",
-            "LastLoginDate": "2022-02-22T10:51:26.127Z",
-            "MachinesCount": 1,
-            "IsLicensed": false,
-            "IsExternalLicensed": false,
-            "ActiveRobotId": null,
-            "MachineNames": [
-                "WINDOWS-HBLCVFS"
-            ],
-            "ActiveMachineNames": [],
-            "LicenseType": null
-        }
+      {
+        "Key": "am\\agunaydi",
+        "UserName": "am\\agunaydi",
+        "LastLoginDate": "2022-02-22T10:51:26.127Z",
+        "MachinesCount": 1,
+        "IsLicensed": false,
+        "IsExternalLicensed": false,
+        "ActiveRobotId": null,
+        "LicenseType": null,
+        "Tenant": null
+      }
     ]
   };
 
   let foldersData = {
-    "@odata.context": "https://cloud.uipath.com/amgenrpa/selfservice/orchestrator_/odata/$metadata#Folders",
-    "@odata.count": 75,
     "value": [
-        {
-            "Key": "b3996f91-67e6-4a27-8522-63281333ff06",
-            "DisplayName": "Shared",
-            "FullyQualifiedName": "Shared",
-            "FullyQualifiedNameOrderable": "Shared",
-            "Description": null,
-            "ProvisionType": "Automatic",
-            "PermissionModel": "FineGrained",
-            "ParentId": null,
-            "ParentKey": null,
-            "IsActive": true,
-            "FeedType": "Processes",
-            "Id": 342038
-        }
+      {
+        "Key": "b3996f91-67e6-4a27-8522-63281333ff06",
+        "DisplayName": "Shared",
+        "FullyQualifiedName": "Shared",
+        "FullyQualifiedNameOrderable": "Shared",
+        "Description": null,
+        "ProvisionType": "Automatic",
+        "PermissionModel": "FineGrained",
+        "ParentId": null,
+        "ParentKey": null,
+        "IsActive": true,
+        "FeedType": "Processes",
+        "Id": 342038,
+        "Tenant": null
+      }
     ]
+  };
+
+  let totalLicensesData = {
+    "ExpireDate": 1654041599,
+    "Allowed": {
+        "Headless": 0,
+        "StudioX": 300,
+        "Attended": 0,
+        "Unattended": 0,
+        "NonProduction": 0,
+        "Development": 0,
+        "StudioPro": 2,
+        "TestAutomation": 0,
+        "AutomationCloud": 0
+    },
+    "Used": {
+        "Headless": 0,
+        "StudioX": 118,
+        "Attended": 1,
+        "Unattended": 0,
+        "NonProduction": 0,
+        "Development": 0,
+        "StudioPro": 3,
+        "TestAutomation": 0,
+        "AutomationCloud": 0
+    },
+    "Tenant": null
   };
 
   _addTable("folders");
@@ -942,6 +990,9 @@ function _next(dataString) {
 
   _addTable("licenses");
   _askForFields(3, licensesData);
+
+  _addTable("totalLicenses");
+  _askForFields(4, totalLicensesData);
 }
 
 // Shows error message below submit button
