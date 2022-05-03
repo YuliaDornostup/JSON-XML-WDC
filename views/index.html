@@ -27,15 +27,20 @@
             <div class="info" title="More Info">?</div>
           </a>
         </div>
-        <p class="label">Tenant id:</p>
-        <div class="row">
-          <input id="url" value="selfservice" />
+        <div id="tenantDiv">
+          <p class="label">Tenant id:</p>
+          <div class="row">
+            <input id="url" value="selfservice" />
+          </div>
         </div>
-        <p class="label">Client secret:</p>
-        <div class="row">
-          <input id="password" type="password" />
+        <div id="secretDiv">
+          <p class="label">Client secret:</p>
+          <div class="row">
+            <input id="password" type="password" />
+          </div>
         </div>
-        <button class="primary" onclick="_next()">Next</button>
+        <button class="primary" id="nextBtn" onclick="_next()">Next</button>
+        <button class="primary" id="submitAuthBtn" onclick="_submitAuth()" style="display: none;">Submit</button>
         <div class="error"></div>
       </div>
 

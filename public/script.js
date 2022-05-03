@@ -23,9 +23,20 @@ let myConnector = tableau.makeConnector();
 myConnector.init = async function(initCallback) {
   tableau.authType = tableau.authTypeEnum.custom;
 
-  if (tableau.phase == tableau.phaseEnum.gatherDataPhase) {
-    var accessToken = await _getToken(tableau.password);
-    tableau.password = accessToken;
+  if (tableau.phase == tableau.phaseEnum.authPhase) {
+    if (tableau.phase == tableau.phaseEnum.authPhase) {
+      let conData = JSON.parse(tableau.connectionData);
+      $("#submitAuthBtn").css('display', 'block');
+      $("#nextBtn").css('display', 'none');
+      $("#url").val(conData.dataUrl);
+      $("#url").prop('disabled', true);
+    }
+  }
+  else if (tableau.phase == tableau.phaseEnum.gatherDataPhase) {
+    var token = await _getToken(tableau.password);
+    let conData = JSON.parse(tableau.connectionData);
+    conData = { ...conData, token };
+    tableau.connectionData = JSON.stringify(conData);
   }
 
   initCallback();
@@ -41,7 +52,7 @@ myConnector.getSchema = function(schemaCallback) {
   let method = conData.method;
   let headers = conData.headers;
   let username = tableau.username || "";
-  let token = tableau.password;
+  let token = conData.token;
   let tableSchemas = [];
 
   // TODO
@@ -234,7 +245,7 @@ myConnector.getData = async function(table, doneCallback) {
   let method = conData.method;
   let headers = conData.headers;
   let username = tableau.username || "";
-  let token = tableau.password;
+  let token = conData.token;
   let tableSchemas = [];
 
   // TODO
@@ -626,7 +637,7 @@ async function _askForFields(tableID, rawData) {
   let method = conData.method;
   let headers = conData.headers;
   let username = tableau.username || "";
-  let token = tableau.password;
+  let token = conData.token;
 
   let div = $(".fields[data-tableid=" + tableID + "]");
   let fieldsTree;
@@ -737,6 +748,11 @@ function _submitDataToTableau() {
   } else {
     _error("No fields selected.");
   }
+}
+
+function _submitAuth() {
+  tableau.password = $("#password").val();
+  tableau.submit();
 }
 
 function toggleAdvanced() {
@@ -875,7 +891,7 @@ function _next(dataString) {
   if (dataString) dataString = _checkJSONFormat(dataString);
   tableau.connectionData = JSON.stringify({ dataString, dataUrl, method, headers });
   tableau.username = username;
-  tableau.password = token || password;
+  tableau.password = password;
 
   let jobsData = {
     "value": [
