@@ -24,13 +24,11 @@ myConnector.init = async function(initCallback) {
   tableau.authType = tableau.authTypeEnum.custom;
 
   if (tableau.phase == tableau.phaseEnum.authPhase) {
-    if (tableau.phase == tableau.phaseEnum.authPhase) {
-      let conData = JSON.parse(tableau.connectionData);
-      $("#submitAuthBtn").css('display', 'block');
-      $("#nextBtn").css('display', 'none');
-      $("#url").val(conData.dataUrl);
-      $("#url").prop('disabled', true);
-    }
+    let conData = JSON.parse(tableau.connectionData);
+    $("#submitAuthBtn").css('display', 'block');
+    $("#nextBtn").css('display', 'none');
+    $("#url").val(conData.dataUrl);
+    $("#url").prop('disabled', true);
   }
   else if (tableau.phase == tableau.phaseEnum.gatherDataPhase) {
     var token = await _getToken(tableau.password);
