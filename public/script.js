@@ -20,6 +20,20 @@ let cachedTableData; // Always a JSON object
 
 let myConnector = tableau.makeConnector();
 
+myConnector.init = async function(initCallback) {
+  tableau.authType = tableau.authTypeEnum.custom;
+
+  if (tableau.phase == tableau.phaseEnum.authPhase) {
+    let conData = JSON.parse(tableau.connectionData);
+    $("#authDiv").css('display', 'block');
+    $("#extraDiv").css('display', 'none');
+    $("#url").val(conData.dataUrl);
+    $("#url").prop('disabled', true);
+  }
+
+  initCallback();
+};
+
 // Create the schemas for each table
 myConnector.getSchema = function(schemaCallback) {
   console.log("Creating table schemas.");
@@ -77,6 +91,12 @@ myConnector.getSchema = function(schemaCallback) {
     }
   );
 };
+
+function _serverLog(log) {
+  $.post("/log" , {
+    log
+  });
+}
 
 // Get the data for each table
 myConnector.getData = function(table, doneCallback) {
@@ -491,6 +511,15 @@ function _submitDataToTableau() {
   } else {
     _error("No fields selected.");
   }
+}
+
+function _submitAuth() {
+  let token = $("#tokenAuth").val();
+  let username = $("#usernameAuth").val();
+  let password = $("#passwordAuth").val();
+  tableau.username = username;
+  tableau.password = token || password;
+  tableau.submit();
 }
 
 function toggleAdvanced() {

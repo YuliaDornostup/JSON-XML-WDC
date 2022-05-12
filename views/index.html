@@ -35,50 +35,77 @@
             <option value="POST">POST</option>
           </select>
         </div>
-        <p class="label small" onclick="toggleAdvanced()">Advanced +</p>
-        <div class="bearerDiv hidden" id="advanced">
 
-          <h3>Authentication</h3>
+        <div id="extraDiv">
+          <p class="label small" onclick="toggleAdvanced()">Advanced +</p>
+          <div class="bearerDiv hidden" id="advanced">
 
-          <p class="label bearerLabel">Bearer:</p>
+            <h3>Authentication</h3>
 
+            <p class="label bearerLabel">Bearer:</p>
+
+            <div class="row">
+              <div class="advancedInput">
+                <p class="label small">Token</p>
+                <input id="token" type="password" />
+              </div>
+            </div>
+
+            <div class="row">
+              <p>
+                or
+              </p>
+            </div>
+            <div class="row">
+              <p class="label bearerLabel">Basic Authentication:</p>
+            </div>
+
+            <div class="row">
+              <div class="advancedInput">
+                <p class="label small">Username</p>
+                <input id="username" type="text" />
+              </div>
+              <div class="advancedInput">
+                <p class="label small">Password</p>
+                <input id="password" type="password" />
+              </div>
+            </div>
+
+            <h3>Headers</h3>
+            <button class="primary" onclick="_addHeader()">+</button>
+            <div id="headers"></div>
+          </div>
+          <div id="dragdrop" class="dragdrop">
+            <b>Or</b> drag & drop a JSON/XML file here
+          </div>
+          <p class="label"><b>Or</b> paste JSON/XML data below:</p>
+          <textarea id="paste" rows="7" cols="50"></textarea>
+          <button class="primary" onclick="_next()">Next</button>
+        </div>
+
+        <div id="authDiv" style="display: none;">
           <div class="row">
             <div class="advancedInput">
               <p class="label small">Token</p>
-              <input id="token" type="password" />
+              <input id="tokenAuth" type="password" />
             </div>
           </div>
-
-          <div class="row">
-            <p>
-              or
-            </p>
-          </div>
-          <div class="row">
-            <p class="label bearerLabel">Basic Authentication:</p>
-          </div>
-
+          <p>
+            or
+          </p>
           <div class="row">
             <div class="advancedInput">
               <p class="label small">Username</p>
-              <input id="username" type="text" />
+              <input id="usernameAuth" type="text" />
             </div>
             <div class="advancedInput">
               <p class="label small">Password</p>
-              <input id="password" type="password" />
+              <input id="passwordAuth" type="password" />
             </div>
           </div>
+          <button class="primary" onclick="_submitAuth()">Submit</button>
+        </div>
 
-          <h3>Headers</h3>
-          <button class="primary" onclick="_addHeader()">+</button>
-          <div id="headers"></div>
-        </div>
-        <div id="dragdrop" class="dragdrop">
-          <b>Or</b> drag & drop a JSON/XML file here
-        </div>
-        <p class="label"><b>Or</b> paste JSON/XML data below:</p>
-        <textarea id="paste" rows="7" cols="50"></textarea>
-        <button class="primary" onclick="_next()">Next</button>
         <div class="error"></div>
       </div>
 
@@ -117,7 +144,7 @@
     /><!-- Hit tracker -->
     <script>
       // Catch browser or non-current Desktop users.
-      setTimeout(function() {
+        setTimeout(function() {
         try {
           var version = +tableau.platformVersion
             .split(".")
@@ -130,7 +157,7 @@
           document.body.innerHTML =
             "<div class='loadError'><p>You must open this WDC in Tableau Desktop 2019.4+ to use it.</p><p><a href='https://tableau.github.io/webdataconnector/docs/wdc_use_in_tableau.html' target='_blank'>Learn how.</a></p></div>";
         }
-      }, 1000);
+      }, 1000); 
     </script>
   </body>
 </html>

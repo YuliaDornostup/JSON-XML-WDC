@@ -18,6 +18,11 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
 });
 
+app.post("/log", async (req, res) => {
+  console.log('[' + new Date() + '] ' + req.body.log);
+  res.send({});
+});
+
 app.post("/proxy/*", async (req, res) => {
   const url = req.url.split("/proxy/")[1];
   let options = {
